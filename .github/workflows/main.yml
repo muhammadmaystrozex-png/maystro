@@ -1,5 +1,7 @@
 name: Build APK
 on: [push]
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,6 +15,7 @@ jobs:
       - name: Build with Buildozer
         run: |
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
+          export ANDROID_SDK_HOME=$HOME/.android
           yes | buildozer android debug
       - name: Upload artifact
         uses: actions/upload-artifact@v4
