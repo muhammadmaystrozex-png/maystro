@@ -14,3 +14,34 @@ jobs:
         run: |
           sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
           sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-pip python3-setuptools python3-wheel \
+            openjdk-17-jdk unzip zip git \
+            libffi-dev libssl-dev autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev cmake
+
+      - name: Install Buildozer
+        run: |
+          pip install --upgrade pip
+          pip install cython buildozer
+
+      - name: Prepare Android SDK
+        run: |
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LegalAssistant
+          path: bin/*.apk
