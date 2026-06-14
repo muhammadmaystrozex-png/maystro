@@ -1,24 +1,47 @@
 name: Build APK
+
 on: [push]
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Increase Swap (fix broken pipe)
+        run: |
+          sudo fallocate -l 6G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
-          pip3 install --user --upgrade buildozer
-      - name: Build with Buildozer
+          sudo apt-get install -y \
+            python3-pip python3-setuptools python3-wheel \
+            openjdk-17-jdk unzip zip git \
+            libffi-dev libssl-dev autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev cmake
+
+      - name: Install Buildozer
         run: |
-          mkdir -p ~/.android && touch ~/.android/repositories.cfg
-          export ANDROID_SDK_HOME=$HOME/.android
-          yes | buildozer android debug
-      - name: Upload artifact
+          pip install --upgrade pip
+          pip install cython buildozer
+
+      - name: Prepare Android SDK
+        run: |
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: package
+          name: LegalAssistant
           path: bin/*.apk
