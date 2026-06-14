@@ -10,8 +10,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Increase Swap (fix broken pipe)
+      - name: Reset & Create Swap
         run: |
+          sudo swapoff -a || true
+          sudo rm -f /swapfile || true
           sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
