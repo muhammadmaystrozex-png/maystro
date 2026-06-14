@@ -8,12 +8,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          # إزالة libtinfo5 لأنها لم تعد متوفرة في التحديثات الجديدة
+          # تثبيت الحزم الأساسية بدون الحزمة المفقودة libtinfo5
           sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
           pip3 install --user --upgrade buildozer
       - name: Build with Buildozer
         run: |
-          # الموافقة على التراخيص تلقائياً وتجهيز البيئة
+          # الموافقة التلقائية على التراخيص
           mkdir -p ~/.android && touch ~/.android/repositories.cfg
           buildozer clean
           yes | buildozer android debug
